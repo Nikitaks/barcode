@@ -55,7 +55,8 @@ public class BarcodeBot extends TelegramLongPollingBot {
     private String processString(String messageText) {
 		
 
-    	if ("mess".equals(messageText) || "joke".equals(messageText)) {
+    	if ("echo".equals(messageText) || "joke".equals(messageText) || 
+    			messageText.startsWith("bar")) {
     		kafkaProduccer.sendMessage(messageText);
     		return "sended";
     	}
@@ -64,7 +65,7 @@ public class BarcodeBot extends TelegramLongPollingBot {
             System.exit(0);
             return "shuting down!";
     	}
-    	return "joke or mess or shut";
+    	return "echo or joke or shut or bar<barcode>";
 	}
 
 	@Override

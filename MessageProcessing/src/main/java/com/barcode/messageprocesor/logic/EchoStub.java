@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.barcode.messageprocesor.dto.Food;
 import com.barcode.messageprocesor.dto.Jokes;
 import com.barcode.messageprocesor.kafka.KafkaProduccer;
 
@@ -28,17 +29,16 @@ public class EchoStub {
 	}
 
 	private String getBarcodeData(String barcode) {
-	/*	
-	 * RestTemplate restTemplate = new RestTemplate();
-
 		
-		HttpHeaders headers = new HttpHeaders();
+	 RestTemplate restTemplate = new RestTemplate();
+	 HttpHeaders headers = new HttpHeaders();
         //headers.add("user-agent", "");
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
         
-		ResponseEntity<Jokes> responce = null;
+		ResponseEntity<Food> responce = null;
 		try {			
-			responce = restTemplate.exchange("https://api.chucknorris.io/jokes/random", HttpMethod.GET,entity,Jokes.class);
+			responce = restTemplate.exchange("https://world.openfoodfacts.org/api/v2/product/" + barcode + ".json", 
+					HttpMethod.GET,entity, Food.class);
 			//responce = restTemplate.getForEntity("https://api.chucknorris.io/jokes/random", Jokes.class);
 		} catch (RestClientException e) {
 			// TODO Auto-generated catch block
@@ -49,9 +49,9 @@ public class EchoStub {
 			e.printStackTrace();
 			return "Error";
 		}
-		String returnedText = responce != null ? responce.getBody().getValue() : "null";
-		*/
-		return "some barcode information stub";
+		String returnedText = responce != null ? responce.getBody().toString() : "null";
+		
+		return returnedText;
 	}
 	
 	private String getJoke() {
@@ -85,8 +85,11 @@ public class EchoStub {
     	if ("joke".equals(messageFromTgBot)) {
     		kafkaProduccer.sendMessage("joke:" + getJoke());
     	}
-    	if ("mess".equals(messageFromTgBot)) {
-    		kafkaProduccer.sendMessage("Recieved by messageProcessingService message at:" + 
+    	if (messageFromTgBot.startsWith("bar")) {
+    		kafkaProduccer.sendMessage("BarcodeData: " + getBarcodeData(messageFromTgBot.substring(3)));
+    	}
+    	if ("echo".equals(messageFromTgBot)) {
+    		kafkaProduccer.sendMessage("echo at:" + 
     			LocalDateTime.now().toString() + " " + messageFromTgBot);
     	}
 	}
