@@ -24,10 +24,6 @@ public class EchoStub {
 	@Autowired
 	private KafkaProduccer kafkaProduccer;
 
-    private String processString(String messageText) {
-    	return getBarcodeData(null);
-	}
-
 	private String getBarcodeData(String barcode) {
 		
 	 RestTemplate restTemplate = new RestTemplate();
@@ -39,13 +35,10 @@ public class EchoStub {
 		try {			
 			responce = restTemplate.exchange("https://world.openfoodfacts.org/api/v2/product/" + barcode + ".json", 
 					HttpMethod.GET,entity, Food.class);
-			//responce = restTemplate.getForEntity("https://api.chucknorris.io/jokes/random", Jokes.class);
 		} catch (RestClientException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "Error";
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "Error";
 		}
@@ -58,26 +51,21 @@ public class EchoStub {
 		RestTemplate restTemplate = new RestTemplate();
 		
 		HttpHeaders headers = new HttpHeaders();
-        //headers.add("user-agent", "");
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
         
 		ResponseEntity<Jokes> responce = null;
 		try {			
 			responce = restTemplate.exchange("https://api.chucknorris.io/jokes/random", HttpMethod.GET,entity,Jokes.class);
-			//responce = restTemplate.getForEntity("https://api.chucknorris.io/jokes/random", Jokes.class);
 		} catch (RestClientException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "Error";
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "Error";
 		}
 		String returnedText = responce != null ? responce.getBody().getValue() : "null";
 		return returnedText;
 	}
-
 
     @KafkaListener(topics = {"tgBotToMessageService"})
 	public void kafkaIncomingMessage(String messageFromTgBot) {
