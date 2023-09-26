@@ -15,6 +15,12 @@ public class KafkaTopicConfig {
     
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
+    
+    @Value(value = "${spring.kafka.barcode.topics.service-to-bot-topicname}")
+    private String messageServiceToTgBotTopicName;
+    
+    @Value(value = "${spring.kafka.barcode.topics.bot-to-service-topicname}")
+    private String tgBotToMessageServiceTopicName;
 
     @Bean
     public KafkaAdmin kafkaAdmin() {
@@ -25,10 +31,10 @@ public class KafkaTopicConfig {
     
     @Bean
     public NewTopic topic1() {
-         return new NewTopic("messageServiceToTgBot", 1, (short) 1);
+         return new NewTopic(messageServiceToTgBotTopicName, 1, (short) 1);
     }
     @Bean
     public NewTopic topic2() {
-         return new NewTopic("tgBotToMessageService", 1, (short) 1);
+         return new NewTopic(tgBotToMessageServiceTopicName, 1, (short) 1);
     }
 }
