@@ -13,15 +13,23 @@
 3. Apache Kafka.
 1. Сервис, предоставляющий информацию о продуктах питания https://world.openfoodfacts.org/data
 5. Сборщик проектов `maven`
+6. Docker
 
 ## Особенности проекта
 1. Проект выполнен в виде двух `maven`-модулей: BotTg - телеграм-бот, первый микросервис, MessageProcessing - обработчик данных, второй микросервис.
+2. Есть возможность запуска как приложений на локальной машине, так и в отдельных Docker-контейнерах.
 
-## Как запустить проект
-1. Настроить параметры соединения с Kafka в /BotTg/src/main/resources/application.properties и /MessageProcessing/src/main/resources/application.properties
+## Как запустить проект на локальной машине
+1. Развернуть сервер Kafka и настроить параметры соединения с Kafka в /BotTg/src/main/resources/application.properties и /MessageProcessing/src/main/resources/application.properties
 2. Выполнить `mvn clean package`.
 3. Запустить сервис BotTg путем запуска на исполнение файла /BotTg/src/main/java/com/barcode/tgbot/TgBotApplication.java с параметрами
 `--com.barcode.tgbot.bot.username=<имя_вашего_бота>`
 `--com.barcode.tgbot.bot.token=<токен_вашего_бота>`
 3. Запустить сервис MessageProcessing путем запуска на исполнение файла /MessageProcessing/src/main/java/com/barcode/messageprocesor/ProcessingServiceApplication.java
+4. Тестировать работу приложения путем оправки боту команд echo (возврат даты и времени), joke (возврат шутки сервиса https://api.chucknorris.io/) или bar<номер_штрихкода>.
+
+## Как запустить проект в отдельных docker-контейнерах
+1. Импортировать исходники и выполнить `mvn clean package`.
+3. Запустить на исполнение скрипт с параметрами: `./dockerIndividualContainers/containersBuild.sh <имя_вашего_бота> <токен_вашего_бота>`
+3. Запустить на исполнение скрипт: `./dockerIndividualContainers/containersStart.sh`
 4. Тестировать работу приложения путем оправки боту команд echo (возврат даты и времени), joke (возврат шутки сервиса https://api.chucknorris.io/) или bar<номер_штрихкода>.
