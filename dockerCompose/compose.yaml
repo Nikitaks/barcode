@@ -1,0 +1,62 @@
+version: '2'
+services:
+  bot-tg-service:
+    restart: always
+    build:
+      context: ../
+      dockerfile: dockerIndividualContainers/Dockerfile.botTg
+      tags:
+        - "bot-tg-image-compose"
+    container_name: bot-tg-container-compose
+    networks:
+      - app-compose-tier
+    depends_on:
+      kafka:
+        condition: service_healthy
+    env_file: ./credentials.env
+    links:
+      - kafka:kafka-server
+    environment:
+      KAFKABOOTSTRAPSERVER: --spring.kafka.bootstrap-servers=kafka-server:9092
+
+  message-processing-service:
+    restart: always
+    build:
+      context: ../
+      dockerfile: dockerIndividualContainers/Dockerfile.messageProcessing
+      tags:
+        - "message-processing-image-compose"
+    container_name: message-processing-container-compose
+    networks:
+      - app-compose-tier
+    depends_on:
+      kafka:
+        condition: service_healthy
+    links:
+      - kafka:kafka-server
+    environment:
+      KAFKABOOTSTRAPSERVER: --spring.kafka.bootstrap-servers=kafka-server:9092
+      
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka-server-container-compose
+    networks:
+      - app-compose-tier
+    hostname: kafka-server
+    environment:
+      KAFKABOOTSTRAPSERVER: --spring.kafka.bootstrap-servers=kafka-server:9092
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker 
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093 
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT 
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka-server:9093 
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER 
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+networks:
+  app-compose-tier:
+
